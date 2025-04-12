@@ -37,6 +37,7 @@ export default function Home() {
       if (data.result) setResult(data.result);
     } catch (err) {
       alert('Error matching resume.');
+      console.error(err);
     } finally {
       setLoading(false);
     }

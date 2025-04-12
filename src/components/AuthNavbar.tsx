@@ -1,7 +1,6 @@
 'use client';
 
-import { SignInButton, UserButton, useUser, useAuth } from '@clerk/nextjs';
-import Link from 'next/link';
+import { UserButton, useUser, useAuth } from '@clerk/nextjs';
 
 export default function AuthNavBar() {
   const { isSignedIn } = useAuth();

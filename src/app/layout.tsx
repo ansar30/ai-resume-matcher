@@ -1,5 +1,4 @@
 // app/layout.tsx or wherever your root layout is
-import AuthNavBar from '@/components/AuthNavbar';
 import { ClerkProvider } from '@clerk/nextjs';
 import './globals.css'; // or wherever your CSS file is
 

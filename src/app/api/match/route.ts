@@ -1,8 +1,6 @@
 // app/api/match/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import formidable from 'formidable';
-import fs from 'fs/promises';
-// @ts-ignore
+//@ts-expect-error
 import pdfParse from 'pdf-parse/lib/pdf-parse.js';
 
 import { chatWithGroq } from '../../../../lib/groq';
@@ -12,6 +10,12 @@ export const config = {
     bodyParser: false,
   },
 };
+
+interface Message {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();

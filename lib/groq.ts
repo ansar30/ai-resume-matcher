@@ -1,12 +1,25 @@
-// lib/groq.ts
 import { Groq } from 'groq-sdk';
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || '', // Make sure your .env file has this key
 });
 
-export async function chatWithGroq(messages: any[]) {
-  const response = await groq.chat.completions.create({
+interface Message {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
+interface GroqResponse {
+  choices: {
+    message: {
+      content: string | null;
+    };
+  }[];
+}
+
+
+export async function chatWithGroq(messages: Message[]): Promise<string | null> {
+  const response: GroqResponse = await groq.chat.completions.create({
     model: 'meta-llama/llama-4-scout-17b-16e-instruct',
     messages,
     temperature: 0.7,
