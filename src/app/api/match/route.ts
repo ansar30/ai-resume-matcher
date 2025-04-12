@@ -1,6 +1,6 @@
 // app/api/match/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-//@ts-expect-error
+// @ts-expect-error: pdf-parse has no type definitions for direct import from 'pdf-parse/lib/pdf-parse.js'
 import pdfParse from 'pdf-parse/lib/pdf-parse.js';
 
 import { chatWithGroq } from '../../../../lib/groq';
@@ -16,11 +16,10 @@ interface Message {
   content: string;
 }
 
-
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
-  const file = formData.get('resume') as File;
-  const jobDescription = formData.get('jobDescription') as string;
+  const file = formData.get('resume') as File | null;
+  const jobDescription = formData.get('jobDescription') as string | null;
 
   if (!file || !jobDescription) {
     return NextResponse.json({ error: 'Missing file or job description' }, { status: 400 });
@@ -28,10 +27,11 @@ export async function POST(req: NextRequest) {
 
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const pdfData = await pdfParse(buffer);
+  // Explicitly type the result from pdfParse
+  const pdfData: { text: string } = await pdfParse(buffer);
   const resumeText = pdfData.text;
 
-  const messages = [
+  const messages: Message[] = [
     {
       role: 'system',
       content: 'You are an AI resume matcher. Compare resume and job description and give a match score with explanation.',
