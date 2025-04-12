@@ -1,14 +1,31 @@
 // app/api/match/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import formidable from 'formidable';
+import fs from 'fs/promises';
+// @ts-ignore
+import pdfParse from 'pdf-parse/lib/pdf-parse.js';
+
 import { chatWithGroq } from '../../../../lib/groq';
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { resumeText, jobDescription } = body;
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
-  if (!resumeText || !jobDescription) {
-    return NextResponse.json({ error: 'Missing resume or job description' }, { status: 400 });
+export async function POST(req: NextRequest) {
+  const formData = await req.formData();
+  const file = formData.get('resume') as File;
+  const jobDescription = formData.get('jobDescription') as string;
+
+  if (!file || !jobDescription) {
+    return NextResponse.json({ error: 'Missing file or job description' }, { status: 400 });
   }
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  const pdfData = await pdfParse(buffer);
+  const resumeText = pdfData.text;
 
   const messages = [
     {
@@ -25,7 +42,7 @@ export async function POST(req: NextRequest) {
     const result = await chatWithGroq(messages);
     return NextResponse.json({ result });
   } catch (err) {
-    console.error('Groq error:', err);
-    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+    console.error(err);
+    return NextResponse.json({ error: 'Failed to generate match' }, { status: 500 });
   }
 }

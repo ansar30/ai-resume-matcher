@@ -1,12 +1,19 @@
-'use client';
+// app/page.tsx
+import { currentUser } from "@clerk/nextjs/server";
+import MatchForm from "@/components/MatchForm";
+import { redirect } from 'next/navigation'
 
-import MatchForm from '../components/MatchForm';
+export default async function Home() {
+  const user = await currentUser();
 
-export default function HomePage() {
+  if (!user) {
+    redirect('/sign-in'); 
+  }
+
   return (
-    <main className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4">AI Resume Matcher</h1>
+    <div className="max-w-4xl mx-auto mt-10 px-4">
+      <h1 className="text-3xl font-bold mb-6">Welcome, {user.firstName} 👋</h1>
       <MatchForm />
-    </main>
+    </div>
   );
 }

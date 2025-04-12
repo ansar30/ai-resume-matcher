@@ -1,14 +1,16 @@
+// app/layout.tsx or wherever your root layout is
+import AuthNavBar from '@/components/AuthNavbar';
 import { ClerkProvider } from '@clerk/nextjs';
-import { Inter } from 'next/font/google';
-import './globals.css';
+import './globals.css'; // or wherever your CSS file is
 
-const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>{children}</body>
+        <body className="bg-gray-50">
+          <main className="">{children}</main>
+        </body>
       </html>
     </ClerkProvider>
   );
