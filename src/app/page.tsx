@@ -11,8 +11,7 @@ export default async function Home() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 px-4">
-      <h1 className="text-3xl font-bold mb-6">Welcome, {user.firstName} 👋</h1>
+    <div className="">
       <MatchForm />
     </div>
   );
