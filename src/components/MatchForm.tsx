@@ -157,19 +157,19 @@ export default function MatchForm() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {useUpload ? (
               <div>
-                <label className="block mb-2 font-medium text-gray-700">Upload Resume (PDF)</label>
+                <label className="block mb-2 font-medium text-gray-700 ">Upload Resume (PDF)</label>
                 <input
                   type="file"
                   id="resumeFile"
                   accept="application/pdf"
-                  className="block cursor-pointer w-full border border-gray-300 rounded-xl px-3 py-3 text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  className="block dark:text-black cursor-pointer w-full border border-gray-300 rounded-xl px-3 py-3 text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
               </div>
             ) : (
               <div>
                 <label className="block mb-2 font-medium text-gray-700">Resume Text</label>
                 <textarea
-                  className="custom-scroll w-full border border-gray-300 p-4 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner placeholder-gray-400"
+                  className="custom-scroll text-black w-full border border-gray-300 p-4 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner placeholder-gray-400"
                   rows={6}
                   placeholder="Paste your resume text here"
                   value={resumeText}
@@ -181,7 +181,7 @@ export default function MatchForm() {
             <div>
               <label className="block mb-2 font-medium text-gray-700">Job Description</label>
               <textarea
-                className="w-full custom-scroll border border-gray-300 p-4 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner placeholder-gray-400"
+                className="w-full dark:text-black custom-scroll border border-gray-300 p-4 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner placeholder-gray-400"
                 rows={6}
                 placeholder="Paste job description here"
                 value={jobDesc}
@@ -195,7 +195,7 @@ export default function MatchForm() {
               className="w-full cursor-pointer bg-[#4D55CC] text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition text-sm"
               disabled={loading}
             >
-              {loading ? 'Matching...' : 'Match Resume'}
+              {loading ? 'Analysing...' : 'Analyse Resume'}
             </button>
           </form>
 
