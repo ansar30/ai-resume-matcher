@@ -55,15 +55,42 @@ export async function POST(req: NextRequest) {
     <li>Some missing job-specific keywords — keyword density can be improved</li>
   </ul>
   
-  <h2 class="mt-2 mb-1">🛠️ How to Improve ATS Score:</h2>
-  <ul class="list-disc list-inside space-y-2">
-    <li>Use exact job keywords from the job description (e.g., "TypeScript", "CI/CD", "Docker")</li>
-    <li>Spell out acronyms at least once (e.g., "Application Programming Interface (API)")</li>
-    <li>Use bullet points under each job with strong action verbs and achievements</li>
-    <li>Avoid using headers like "My Journey" or "About Me" — use standard terms</li>
-    <li>Ensure all content is text-based (not embedded in images or infographics)</li>
-    <li>Include a "Technical Skills" section listing tools and frameworks</li>
-  </ul>
+<h2 class="mt-2 mb-1">🛠️ How to Improve ATS Score:</h2>
+<table class="table-auto border-collapse border border-gray-300 w-full text-left text-sm">
+  <thead class="bg-gray-100">
+    <tr>
+      <th class="border border-gray-300 px-2 py-1">Detected Issue</th>
+      <th class="border border-gray-300 px-2 py-1">Action to Improve ATS Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="border border-gray-300 px-2 py-1">Missing job-specific keywords</td>
+      <td class="border border-gray-300 px-2 py-1">Scan the job description and mirror relevant terms exactly (e.g., “CI/CD”, “Docker”, “Agile”)</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-300 px-2 py-1">Non-standard section headings</td>
+      <td class="border border-gray-300 px-2 py-1">Use universal labels: “Work Experience”, “Skills”, “Education”, “Projects”</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-300 px-2 py-1">Weak or generic bullet points</td>
+      <td class="border border-gray-300 px-2 py-1">Use action verbs + measurable results (e.g., “Increased API performance by 30%”)</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-300 px-2 py-1">Acronyms without explanations</td>
+      <td class="border border-gray-300 px-2 py-1">Spell out once: “Application Programming Interface (API)” — improves clarity for ATS parsing</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-300 px-2 py-1">Lack of structured keyword section</td>
+      <td class="border border-gray-300 px-2 py-1">Add a “Technical Skills” or “Core Competencies” section with keyword-rich content</td>
+    </tr>
+    <tr>
+      <td class="border border-gray-300 px-2 py-1">Unparseable content (graphics, tables)</td>
+      <td class="border border-gray-300 px-2 py-1">Use plain text — avoid columns, images, tables, or fancy designs</td>
+    </tr>
+  </tbody>
+</table>
+
   
   <h2 class="mb-2">✅ Strengths</h2>
   <ul class="list-disc list-inside space-y-2">
