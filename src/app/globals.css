@@ -45,3 +45,21 @@ body {
   background: transparent;
   padding: 4px;
 }
+
+h2{
+  font-size: 18px;
+  font-weight: bold;
+}
+
+p {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+li {
+  /* text-decoration: dotted; */
+}
+
+ul{
+  list-style-type: circle;
+}

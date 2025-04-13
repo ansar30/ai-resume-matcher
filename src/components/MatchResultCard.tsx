@@ -2,7 +2,8 @@
 
 import { motion } from 'framer-motion';
 import { BadgeCheck } from 'lucide-react';
-import ReactMarkdown from 'react-markdown'; // Import react-markdown
+// import ReactMarkdown from 'react-markdown';
+// import remarkGfm from 'remark-gfm'; // Optional for better markdown tables, lists, etc.
 import 'react-circular-progressbar/dist/styles.css';
 
 export default function MatchResultCard({
@@ -19,7 +20,7 @@ export default function MatchResultCard({
       transition={{ duration: 0.4 }}
       className="w-full mt-10"
     >
-      <div className="relative bg-white/80 dark:bg-[#111]/80 backdrop-blur-lg border border-blue-100 dark:border-gray-700 rounded-3xl shadow-xl px-6 py-8 transition-all duration-300 hover:shadow-2xl">
+      <div className="relative bg-white/90 dark:bg-[#111]/80 backdrop-blur-xl border border-blue-100 dark:border-gray-800 rounded-3xl shadow-xl px-6 py-8 transition-all duration-300 hover:shadow-2xl">
         
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -31,17 +32,18 @@ export default function MatchResultCard({
           </div>
 
           {/* Score badge */}
-          <span className="px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-semibold shadow-md">
-            Score: {score}/10
+          <span className="px-3 py-1 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold shadow">
+            Match Score: {score}/10
           </span>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Result Text */}
-          <div className="flex-1 max-h-72 overflow-y-auto pr-1 custom-scroll text-sm leading-relaxed text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-            {/* Use ReactMarkdown to render Markdown content */}
-            <ReactMarkdown>{result}</ReactMarkdown>
-          </div>
+        {/* Result Content */}
+        <div className="flex flex-col gap-6">
+<div
+  className="max-h-[400px] overflow-y-auto pr-2 custom-scroll text-sm leading-relaxed text-gray-700 dark:text-gray-300"
+  dangerouslySetInnerHTML={{ __html: result }}
+/>
+
         </div>
       </div>
     </motion.div>

@@ -19,60 +19,67 @@ export default function MatchForm() {
   const [useUpload, setUseUpload] = useState(true);
 
   const [dragActive, setDragActive] = useState(false);
-const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [atsScore, setAtsScore] = useState(0);
+  const [matchScore, setMatchScore] = useState(0);
 
-const onDrop = useCallback((acceptedFiles: File[]) => {
-  if (acceptedFiles && acceptedFiles.length > 0) {
-    setUploadedFile(acceptedFiles[0]);
-    toast.success('File uploaded successfully');
-  }
-}, []);
-
-const { getRootProps, getInputProps } = useDropzone({
-  onDrop,
-  accept: { 'application/pdf': [] },
-  multiple: false,
-  onDragEnter: () => setDragActive(true),
-  onDragLeave: () => setDragActive(false),
-});
-
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
-
-  const formData = new FormData();
-  formData.append('jobDescription', jobDesc);
-
-  if (useUpload) {
-    if (!uploadedFile) {
-      toast.error('Please upload a PDF file.');
-      setLoading(false);
-      return;
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles && acceptedFiles.length > 0) {
+      setUploadedFile(acceptedFiles[0]);
+      toast.success('File uploaded successfully');
     }
-    formData.append('resume', uploadedFile);
-  } else {
-    if (!resumeText.trim()) {
-      toast.error('Please enter resume text.');
-      setLoading(false);
-      return;
-    }
-    formData.append('resume', new Blob([resumeText], { type: 'text/plain' }), 'resume.txt');
-  }
+  }, []);
 
-  try {
-    const res = await fetch('/api/match', {
-      method: 'POST',
-      body: formData,
-    });
-    const data = await res.json();
-    if (data.result) setResult(data.result);
-  } catch (err) {
-    toast.error('Error matching resume.');
-    console.error(err);
-  } finally {
-    setLoading(false);
-  }
-};
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: { 'application/pdf': [] },
+    multiple: false,
+    onDragEnter: () => setDragActive(true),
+    onDragLeave: () => setDragActive(false),
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append('jobDescription', jobDesc);
+
+    if (useUpload) {
+      if (!uploadedFile) {
+        toast.error('Please upload a PDF file.');
+        setLoading(false);
+        return;
+      }
+      formData.append('resume', uploadedFile);
+    } else {
+      if (!resumeText.trim()) {
+        toast.error('Please enter resume text.');
+        setLoading(false);
+        return;
+      }
+      formData.append('resume', new Blob([resumeText], { type: 'text/plain' }), 'resume.txt');
+    }
+
+    try {
+      const res = await fetch('/api/match', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data) {
+        setResult(data.result);
+        setAtsScore(data.atsScore);
+        setMatchScore(data.matchScore);
+
+      }
+    } catch (err) {
+      toast.error('Error matching resume.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   function extractScore(result: string | null): number {
@@ -95,34 +102,35 @@ const handleSubmit = async (e: React.FormEvent) => {
   function extractAtsScore(result: string | null): number {
     if (!result) return 0;
 
-    const atsScoreMatch = result.match(/ATS Friendly Format Score:\s*(\d{1,3})%/i);
+    const atsScoreMatch = result.match(/ATS Score:\s*(\d{1,3})%/i); // This now matches your actual label
     if (atsScoreMatch) {
       return Math.min(100, parseInt(atsScoreMatch[1], 10));
     }
-  
+
     return 0;
   }
+
 
 
   useEffect(() => {
     const score = extractScore(result);
     const ats = extractAtsScore(result);
-    
+
     let currentScore = 0;
     let currentATS = 0;
-  
+
     const interval = setInterval(() => {
       if (currentScore < score) currentScore++;
       if (currentATS < ats) currentATS++;
-  
+
       if (currentScore >= score && currentATS >= ats) {
         clearInterval(interval);
       }
     }, 15);
-  
+
     return () => clearInterval(interval);
   }, [result]);
-  
+
 
   function MatchResultCard({ result, score, atsScore }: { result: string; score: number, atsScore: number }) {
     return (
@@ -156,11 +164,11 @@ const handleSubmit = async (e: React.FormEvent) => {
           <div className="border-t border-gray-200 dark:border-gray-700 mb-4"></div>
 
           {/* Content */}
-          <div className="max-h-72 overflow-y-auto pr-1 custom-scroll text-sm leading-relaxed text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-            <div className="flex items-start gap-2">
-              <p>{result}</p>
-            </div>
-          </div>
+          <div
+            className="max-h-[400px] overflow-y-auto pr-2 custom-scroll text-sm leading-relaxed text-gray-700 dark:text-gray-300"
+            dangerouslySetInnerHTML={{ __html: result }}
+          />
+
         </div>
       </motion.div>
     );
@@ -207,25 +215,24 @@ const handleSubmit = async (e: React.FormEvent) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {useUpload ? (
               <div>
-              <label className="block mb-2 font-medium text-gray-700">Upload Resume (PDF)</label>
-              <div
-                {...getRootProps()}
-                className={`border-2 border-dashed rounded-xl p-6 cursor-pointer text-center transition-all duration-300 ${
-                  dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-                }`}
-              >
-                <input className="cursor-pointer" {...getInputProps()} id="resumeFile" />
-                <p className="text-sm text-gray-600">
-                  {uploadedFile ? (
-                    <span className="font-medium cursor-pointer text-blue-600">{uploadedFile.name}</span>
-                  ) : dragActive ? (
-                    'Drop your PDF here...'
-                  ) : (
-                    'Drag & drop your resume here, or click to select a PDF'
-                  )}
-                </p>
+                <label className="block mb-2 font-medium text-gray-700">Upload Resume (PDF)</label>
+                <div
+                  {...getRootProps()}
+                  className={`border-2 border-dashed rounded-xl p-6 cursor-pointer text-center transition-all duration-300 ${dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                    }`}
+                >
+                  <input className="cursor-pointer" {...getInputProps()} id="resumeFile" />
+                  <p className="text-sm text-gray-600">
+                    {uploadedFile ? (
+                      <span className="font-medium cursor-pointer text-blue-600">{uploadedFile.name}</span>
+                    ) : dragActive ? (
+                      'Drop your PDF here...'
+                    ) : (
+                      'Drag & drop your resume here, or click to select a PDF'
+                    )}
+                  </p>
+                </div>
               </div>
-            </div>
             ) : (
               <div>
                 <label className="block mb-2 font-medium text-gray-700">Resume Text</label>
@@ -261,7 +268,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           </form>
 
           {result && (
-            <MatchResultCard result={result} score={extractScore(result)} atsScore={extractAtsScore(result)} />
+            <MatchResultCard result={result} score={matchScore} atsScore={atsScore} />
           )}
 
 
