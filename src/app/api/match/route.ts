@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
   const messages: Message[] = [
     {
       role: 'system',
-      content: 'You are an AI resume matcher. Compare resume and job description and give a match score with explanation.',
+      content: 'You are an AI resume matcher. Compare resume and job description and give a match score with explanation. Give the ATS friendly format score as well in percentage, Improvement tips for the ATS friendly resume',
     },
     {
       role: 'user',

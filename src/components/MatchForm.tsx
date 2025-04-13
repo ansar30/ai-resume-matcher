@@ -66,18 +66,39 @@ export default function MatchForm() {
     return 0;
   }
 
+  function extractAtsScore(result: string | null): number {
+    if (!result) return 0;
+
+    const atsScoreMatch = result.match(/ATS Friendly Format Score:\s*(\d{1,3})%/i);
+    if (atsScoreMatch) {
+      return Math.min(100, parseInt(atsScoreMatch[1], 10));
+    }
+  
+    return 0;
+  }
+
 
   useEffect(() => {
     const score = extractScore(result);
-    let current = 0;
+    const ats = extractAtsScore(result);
+    
+    let currentScore = 0;
+    let currentATS = 0;
+  
     const interval = setInterval(() => {
-      current += 1;
-      if (current >= score) clearInterval(interval);
+      if (currentScore < score) currentScore++;
+      if (currentATS < ats) currentATS++;
+  
+      if (currentScore >= score && currentATS >= ats) {
+        clearInterval(interval);
+      }
     }, 15);
+  
     return () => clearInterval(interval);
   }, [result]);
+  
 
-  function MatchResultCard({ result, score }: { result: string; score: number }) {
+  function MatchResultCard({ result, score, atsScore }: { result: string; score: number, atsScore: number }) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -97,7 +118,10 @@ export default function MatchForm() {
             </div>
 
             <span className="px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-semibold shadow-md">
-              Score: {score}%
+              Overall Score: {score}%
+            </span>
+            <span className="px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-semibold shadow-md">
+              ATS Score: {atsScore}%
             </span>
           </div>
 
@@ -200,7 +224,7 @@ export default function MatchForm() {
           </form>
 
           {result && (
-            <MatchResultCard result={result} score={extractScore(result)} />
+            <MatchResultCard result={result} score={extractScore(result)} atsScore={extractAtsScore(result)} />
           )}
 
 
