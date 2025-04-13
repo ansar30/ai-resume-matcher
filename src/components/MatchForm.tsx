@@ -7,6 +7,9 @@ import { Upload, FileText, BadgeCheck } from 'lucide-react';
 import 'react-circular-progressbar/dist/styles.css';
 import { Toaster, toast } from 'react-hot-toast';
 import AuthNavBar from './AuthNavbar';
+import { useDropzone } from 'react-dropzone';
+import { useCallback } from 'react';
+
 
 export default function MatchForm() {
   const [jobDesc, setJobDesc] = useState('');
@@ -15,39 +18,62 @@ export default function MatchForm() {
   const [loading, setLoading] = useState(false);
   const [useUpload, setUseUpload] = useState(true);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const [dragActive, setDragActive] = useState(false);
+const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
-    const formData = new FormData();
-    formData.append('jobDescription', jobDesc);
+const onDrop = useCallback((acceptedFiles: File[]) => {
+  if (acceptedFiles && acceptedFiles.length > 0) {
+    setUploadedFile(acceptedFiles[0]);
+    toast.success('File uploaded successfully');
+  }
+}, []);
 
-    if (useUpload) {
-      const fileInput = document.getElementById('resumeFile') as HTMLInputElement;
-      if (!fileInput?.files?.[0]) {
-        toast.error('Please upload a PDF file.');
-        setLoading(false);
-        return;
-      }
-      formData.append('resume', fileInput.files[0]);
-    } else {
-      formData.append('resume', new Blob([resumeText], { type: 'text/plain' }), 'resume.txt');
-    }
+const { getRootProps, getInputProps } = useDropzone({
+  onDrop,
+  accept: { 'application/pdf': [] },
+  multiple: false,
+  onDragEnter: () => setDragActive(true),
+  onDragLeave: () => setDragActive(false),
+});
 
-    try {
-      const res = await fetch('/api/match', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.result) setResult(data.result);
-    } catch (err) {
-      toast.error('Error matching resume.');
-      console.error(err);
-    } finally {
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+
+  const formData = new FormData();
+  formData.append('jobDescription', jobDesc);
+
+  if (useUpload) {
+    if (!uploadedFile) {
+      toast.error('Please upload a PDF file.');
       setLoading(false);
+      return;
     }
-  };
+    formData.append('resume', uploadedFile);
+  } else {
+    if (!resumeText.trim()) {
+      toast.error('Please enter resume text.');
+      setLoading(false);
+      return;
+    }
+    formData.append('resume', new Blob([resumeText], { type: 'text/plain' }), 'resume.txt');
+  }
+
+  try {
+    const res = await fetch('/api/match', {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+    if (data.result) setResult(data.result);
+  } catch (err) {
+    toast.error('Error matching resume.');
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   function extractScore(result: string | null): number {
     if (!result) return 0;
@@ -181,14 +207,25 @@ export default function MatchForm() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {useUpload ? (
               <div>
-                <label className="block mb-2 font-medium text-gray-700 ">Upload Resume (PDF)</label>
-                <input
-                  type="file"
-                  id="resumeFile"
-                  accept="application/pdf"
-                  className="block dark:text-black cursor-pointer w-full border border-gray-300 rounded-xl px-3 py-3 text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
+              <label className="block mb-2 font-medium text-gray-700">Upload Resume (PDF)</label>
+              <div
+                {...getRootProps()}
+                className={`border-2 border-dashed rounded-xl p-6 cursor-pointer text-center transition-all duration-300 ${
+                  dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                }`}
+              >
+                <input className="cursor-pointer" {...getInputProps()} id="resumeFile" />
+                <p className="text-sm text-gray-600">
+                  {uploadedFile ? (
+                    <span className="font-medium cursor-pointer text-blue-600">{uploadedFile.name}</span>
+                  ) : dragActive ? (
+                    'Drop your PDF here...'
+                  ) : (
+                    'Drag & drop your resume here, or click to select a PDF'
+                  )}
+                </p>
               </div>
+            </div>
             ) : (
               <div>
                 <label className="block mb-2 font-medium text-gray-700">Resume Text</label>
