@@ -1,20 +1,19 @@
 // MatchForm.tsx (Updated UI)
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Upload, FileText, BadgeCheck } from 'lucide-react';
-import 'react-circular-progressbar/dist/styles.css';
-import { Toaster, toast } from 'react-hot-toast';
-import AuthNavBar from './AuthNavbar';
-import { useDropzone } from 'react-dropzone';
-import { useCallback } from 'react';
-
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Upload, FileText, BadgeCheck } from "lucide-react";
+import "react-circular-progressbar/dist/styles.css";
+import { Toaster, toast } from "react-hot-toast";
+import AuthNavBar from "./AuthNavbar";
+import { useDropzone } from "react-dropzone";
+import { useCallback } from "react";
 
 export default function MatchForm() {
-  const [jobDesc, setJobDesc] = useState('');
-  const [resumeText, setResumeText] = useState('');
-  const [result, setResult] = useState('');
+  const [jobDesc, setJobDesc] = useState("");
+  const [resumeText, setResumeText] = useState("");
+  const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [useUpload, setUseUpload] = useState(true);
 
@@ -26,13 +25,13 @@ export default function MatchForm() {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles && acceptedFiles.length > 0) {
       setUploadedFile(acceptedFiles[0]);
-      toast.success('File uploaded successfully');
+      toast.success("File uploaded successfully");
     }
   }, []);
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: { 'application/pdf': [] },
+    accept: { "application/pdf": [] },
     multiple: false,
     onDragEnter: () => setDragActive(true),
     onDragLeave: () => setDragActive(false),
@@ -43,27 +42,31 @@ export default function MatchForm() {
     setLoading(true);
 
     const formData = new FormData();
-    formData.append('jobDescription', jobDesc);
+    formData.append("jobDescription", jobDesc);
 
     if (useUpload) {
       if (!uploadedFile) {
-        toast.error('Please upload a PDF file.');
+        toast.error("Please upload a PDF file.");
         setLoading(false);
         return;
       }
-      formData.append('resume', uploadedFile);
+      formData.append("resume", uploadedFile);
     } else {
       if (!resumeText.trim()) {
-        toast.error('Please enter resume text.');
+        toast.error("Please enter resume text.");
         setLoading(false);
         return;
       }
-      formData.append('resume', new Blob([resumeText], { type: 'text/plain' }), 'resume.txt');
+      formData.append(
+        "resume",
+        new Blob([resumeText], { type: "text/plain" }),
+        "resume.txt"
+      );
     }
 
     try {
-      const res = await fetch('/api/match', {
-        method: 'POST',
+      const res = await fetch("/api/match", {
+        method: "POST",
         body: formData,
       });
       const data = await res.json();
@@ -71,16 +74,14 @@ export default function MatchForm() {
         setResult(data.result);
         setAtsScore(data.atsScore);
         setMatchScore(data.matchScore);
-
       }
     } catch (err) {
-      toast.error('Error matching resume.');
+      toast.error("Error matching resume.");
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
-
 
   function extractScore(result: string | null): number {
     if (!result) return 0;
@@ -110,8 +111,6 @@ export default function MatchForm() {
     return 0;
   }
 
-
-
   useEffect(() => {
     const score = extractScore(result);
     const ats = extractAtsScore(result);
@@ -131,8 +130,15 @@ export default function MatchForm() {
     return () => clearInterval(interval);
   }, [result]);
 
-
-  function MatchResultCard({ result, score, atsScore }: { result: string; score: number, atsScore: number }) {
+  function MatchResultCard({
+    result,
+    score,
+    atsScore,
+  }: {
+    result: string;
+    score: number;
+    atsScore: number;
+  }) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -141,11 +147,13 @@ export default function MatchForm() {
         className="w-full mt-10"
       >
         <div className="relative bg-white/80 dark:bg-[#111]/80 backdrop-blur-lg border border-blue-100 dark:border-gray-700 rounded-3xl shadow-xl px-6 py-8 transition-all duration-300 hover:shadow-2xl">
-
           {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
-              <BadgeCheck className="text-blue-600 dark:text-blue-400" size={24} />
+              <BadgeCheck
+                className="text-blue-600 dark:text-blue-400"
+                size={24}
+              />
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                 Resume Match Result
               </h3>
@@ -159,7 +167,6 @@ export default function MatchForm() {
             </span>
           </div>
 
-
           {/* Divider */}
           <div className="border-t border-gray-200 dark:border-gray-700 mb-4"></div>
 
@@ -168,7 +175,6 @@ export default function MatchForm() {
             className="max-h-[400px] overflow-y-auto pr-2 custom-scroll text-sm leading-relaxed text-gray-700 dark:text-gray-300"
             dangerouslySetInnerHTML={{ __html: result }}
           />
-
         </div>
       </motion.div>
     );
@@ -191,8 +197,11 @@ export default function MatchForm() {
               <button
                 type="button"
                 onClick={() => setUseUpload(true)}
-                className={`px-6 py-2 text-sm font-medium transition-all duration-300 ${useUpload ? 'bg-[#4D55CC] text-white' : 'text-gray-700 hover:bg-gray-100'
-                  }`}
+                className={`px-6 py-2 text-sm font-medium transition-all duration-300 ${
+                  useUpload
+                    ? "bg-[#4D55CC] text-white"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
               >
                 <div className="flex items-center gap-2">
                   <Upload size={16} /> Upload PDF
@@ -201,8 +210,11 @@ export default function MatchForm() {
               <button
                 type="button"
                 onClick={() => setUseUpload(false)}
-                className={`px-6 py-2 text-sm font-medium transition-all duration-300 ${!useUpload ? 'bg-[#4D55CC] text-white' : 'text-gray-700 hover:bg-gray-100'
-                  }`}
+                className={`px-6 py-2 text-sm font-medium transition-all duration-300 ${
+                  !useUpload
+                    ? "bg-[#4D55CC] text-white"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
               >
                 <div className="flex items-center gap-2">
                   <FileText size={16} /> Paste Text
@@ -211,31 +223,43 @@ export default function MatchForm() {
             </div>
           </div>
 
-
           <form onSubmit={handleSubmit} className="space-y-6">
             {useUpload ? (
               <div>
-                <label className="block mb-2 font-medium text-gray-700">Upload Resume (PDF)</label>
+                <label className="block mb-2 font-medium text-gray-700">
+                  Upload Resume (PDF)
+                </label>
                 <div
                   {...getRootProps()}
-                  className={`border-2 border-dashed rounded-xl p-6 cursor-pointer text-center transition-all duration-300 ${dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-                    }`}
+                  className={`border-2 border-dashed rounded-xl p-6 cursor-pointer text-center transition-all duration-300 ${
+                    dragActive
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-300"
+                  }`}
                 >
-                  <input className="cursor-pointer" {...getInputProps()} id="resumeFile" />
+                  <input
+                    className="cursor-pointer"
+                    {...getInputProps()}
+                    id="resumeFile"
+                  />
                   <p className="text-sm text-gray-600">
                     {uploadedFile ? (
-                      <span className="font-medium cursor-pointer text-blue-600">{uploadedFile.name}</span>
+                      <span className="font-medium cursor-pointer text-blue-600">
+                        {uploadedFile.name}
+                      </span>
                     ) : dragActive ? (
-                      'Drop your PDF here...'
+                      "Drop your PDF here..."
                     ) : (
-                      'Drag & drop your resume here, or click to select a PDF'
+                      "Drag & drop your resume here, or click to select a PDF"
                     )}
                   </p>
                 </div>
               </div>
             ) : (
               <div>
-                <label className="block mb-2 font-medium text-gray-700">Resume Text</label>
+                <label className="block mb-2 font-medium text-gray-700">
+                  Resume Text
+                </label>
                 <textarea
                   className="custom-scroll text-black w-full border border-gray-300 p-4 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner placeholder-gray-400"
                   rows={6}
@@ -247,14 +271,15 @@ export default function MatchForm() {
             )}
 
             <div>
-              <label className="block mb-2 font-medium text-gray-700">Job Description</label>
+              <label className="block mb-2 font-medium text-gray-700">
+                Job Description
+              </label>
               <textarea
                 className="w-full dark:text-black custom-scroll border border-gray-300 p-4 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner placeholder-gray-400"
                 rows={6}
                 placeholder="Paste job description here"
                 value={jobDesc}
                 onChange={(e) => setJobDesc(e.target.value)}
-                required
               />
             </div>
 
@@ -263,16 +288,17 @@ export default function MatchForm() {
               className="w-full cursor-pointer bg-[#4D55CC] text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition text-sm"
               disabled={loading}
             >
-              {loading ? 'Analysing...' : 'Analyse Resume'}
+              {loading ? "Analysing..." : "Analyse Resume"}
             </button>
           </form>
 
           {result && (
-            <MatchResultCard result={result} score={matchScore} atsScore={atsScore} />
+            <MatchResultCard
+              result={result}
+              score={matchScore}
+              atsScore={atsScore}
+            />
           )}
-
-
-
         </motion.div>
       </main>
     </div>
