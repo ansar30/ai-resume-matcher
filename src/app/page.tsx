@@ -1,6 +1,6 @@
 // app/page.tsx
 import { currentUser } from "@clerk/nextjs/server";
-import MatchForm from "@/components/MatchForm";
+import Dashboard from "@/components/Dashboard";
 import { redirect } from 'next/navigation'
 
 export default async function Home() {
@@ -10,9 +10,13 @@ export default async function Home() {
     redirect('/sign-in'); 
   }
 
-  return (
-    <div className="">
-      <MatchForm />
-    </div>
-  );
+  // Extract only the plain data we need
+  const userData = {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.emailAddresses[0]?.emailAddress,
+  };
+
+  return <Dashboard user={userData} />;
 }
